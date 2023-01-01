@@ -1,0 +1,76 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    container_name: medusa-server
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app/medusa
+      - backend_node_modules:/app/medusa/node_modules
+    ports:
+      - "9000:9000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/medusa-docker
+      REDIS_URL: redis://cache
+
+  postgres:
+    image: postgres:10.4-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: medusa-docker
+
+  redis:
+    image: redis:7.0.7-alpine
+    container_name: cache
+    expose:
+      - 6379
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    image: admin:latest
+    restart: always
+    depends_on:
+      - backend
+    container_name: medusa-admin
+    ports:
+      - "7000:7000"
+    environment:
+      MEDUSA_BACKEND_URL: http://backend:9000
+      NODE_OPTIONS: --openssl-legacy-provider
+
+  storefront:
+    build:
+      context: ./storefront
+      dockerfile: Dockerfile
+    container_name: medusa-storefront
+    restart: always
+    depends_on:
+      - backend
+    volumes:
+      - ./storefront:/app/storefront
+      - storefront_node_modules:/app/storefront/node_modules
+    ports:
+      - "8100:8100"
+
+volumes:
+  storefront_node_modules:
+  backend_node_modules:
