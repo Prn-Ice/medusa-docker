@@ -8,8 +8,59 @@ A medusa store is made up of the following components
 - The admin dashboard
 - The storefront
 
-![Medusa Architecture](https://res.cloudinary.com/dza7lstvk/image/upload/v1667999772/Medusa%20Docs/Diagrams/ZHvM2bu_td4rnx.png)
-*Image showing medusa architecture, from [here](https://docs.medusajs.com/introduction/#architecture)*
+```sh
+.
+├── admin
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── LICENSE
+│   ├── netlify.toml
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── README.md
+│   ├── src
+│   ├── static
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── vite.config.ts
+│   └── yarn.lock
+├── backend
+│   ├── data
+│   ├── develop.sh
+│   ├── Dockerfile
+│   ├── medusa-config.js
+│   ├── package.json
+│   ├── README.md
+│   ├── src
+│   ├── tsconfig.json
+│   └── yarn.lock
+├── docker-compose.yml
+├── README.md
+└── storefront
+    ├── cypress
+    ├── cypress.json
+    ├── Dockerfile
+    ├── LICENSE
+    ├── netlify.toml
+    ├── next.config.js
+    ├── next-env.d.ts
+    ├── next-sitemap.js
+    ├── package.json
+    ├── postcss.config.js
+    ├── public
+    ├── README.md
+    ├── src
+    ├── store-config.js
+    ├── store.config.json
+    ├── tailwind.config.js
+    ├── tsconfig.json
+    └── yarn.lock
+
+11 directories, 36 files
+```
+
+
 
 ### Headless Backend
 
