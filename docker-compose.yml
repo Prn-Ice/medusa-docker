@@ -11,6 +11,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      minio:
+        condition: service_started
     volumes:
       - ./backend:/app/medusa
       - backend_node_modules:/app/medusa/node_modules
@@ -20,27 +22,61 @@ services:
       NODE_ENV: development
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/medusa-docker
       REDIS_URL: redis://cache
+      MINIO_ENDPOINT: http://172.28.0.4:9000
+      MINIO_BUCKET: medusa-bucket
+      MINIO_ACCESS_KEY: xcR03RPNuMRdlc5N
+      MINIO_SECRET_KEY: 45bfbca12ibtgtGxn4JTeHF8uwrYgdRX
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.1
 
   postgres:
     image: postgres:10.4-alpine
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
     expose:
       - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: medusa-docker
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.2
 
   redis:
     image: redis:7.0.7-alpine
+    restart: always
     container_name: cache
     expose:
       - 6379
+    volumes:
+      - redis_data:/data
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.3
+
+  minio:
+    image: quay.io/minio/minio
+    restart: always
+    ports:
+      - "9001:9000"
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: ROOTNAME
+      MINIO_ROOT_PASSWORD: CHANGEME123
+    command: server /data --console-address ":9090"
+    volumes:
+      - minio_data:/data
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.4
 
   admin:
     build:
@@ -54,8 +90,11 @@ services:
     ports:
       - "7000:7000"
     environment:
-      MEDUSA_BACKEND_URL: http://backend:9000
+      MEDUSA_BACKEND_URL: http://172.28.0.1:9000
       NODE_OPTIONS: --openssl-legacy-provider
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.5
 
   storefront:
     build:
@@ -70,7 +109,23 @@ services:
       - storefront_node_modules:/app/storefront/node_modules
     ports:
       - "8100:8100"
+    environment:
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://172.28.0.1:9000
+    networks:
+      my_network:
+        ipv4_address: 172.28.0.6
+
+networks:
+  my_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.254
 
 volumes:
   storefront_node_modules:
   backend_node_modules:
+  minio_data:
+  postgres_data:
+  redis_data:
