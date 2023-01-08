@@ -1,9 +1,12 @@
 [submodule "admin"]
 	path = admin
 	url = https://github.com/Prn-Ice/medusa-admin.git
+	branch = main
 [submodule "storefront"]
 	path = storefront
 	url = https://github.com/Prn-Ice/medusa-storefront.git
+	branch = main
 [submodule "backend"]
 	path = backend
 	url = https://github.com/Prn-Ice/medusa-backend.git
+	branch = master
