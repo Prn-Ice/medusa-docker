@@ -24,8 +24,8 @@ services:
       REDIS_URL: redis://cache
       MINIO_ENDPOINT: http://minio:9000
       MINIO_BUCKET: medusa-bucket
-      MINIO_ACCESS_KEY: AKAFMGGNe2jOPerG
-      MINIO_SECRET_KEY: zD595HUAJS96Hwg8nxoke2ZGJoFj3ryB
+      MINIO_ACCESS_KEY: 7nR9aSt9LR32Py3o
+      MINIO_SECRET_KEY: ath8oTjP2rLdhY08EwLMUZksvWwhPyGv
     
   postgres:
     image: postgres:10.4-alpine
